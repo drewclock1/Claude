@@ -1,40 +1,27 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
         avara: {
-          50:  '#f5f3ef',
-          100: '#e8e3d9',
-          200: '#d4c9b4',
-          300: '#bca98a',
-          400: '#a68b65',
-          500: '#8f7250',
-          600: '#755c3f',
-          700: '#5c4632',
-          800: '#3d2e21',
-          900: '#1e1710',
-        },
-        navy: {
-          50:  '#eef1f7',
-          100: '#d5dced',
-          200: '#aab8db',
-          300: '#7a91c5',
-          400: '#4f6dad',
-          500: '#344f8f',
-          600: '#263b72',
-          700: '#1a2a55',
-          800: '#101c3a',
-          900: '#080e1e',
+          bg:         '#1A1612',
+          surface:    '#2A2520',
+          elevated:   '#3A3028',
+          border:     '#3A3028',
+          gold:       '#B8966A',
+          'gold-light': '#D4B483',
+          'gold-pale':  '#F0E6D3',
+          cream:      '#FAF7F2',
+          muted:      '#9A8E82',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Playfair Display', 'Georgia', 'serif'],
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
+        sans:    ['"DM Sans"', 'system-ui', 'sans-serif'],
+      },
+      backgroundImage: {
+        'gold-gradient': 'linear-gradient(135deg, #B8966A 0%, #D4B483 100%)',
       },
     },
   },

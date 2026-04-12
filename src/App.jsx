@@ -14,8 +14,9 @@ import HomeScreen from './screens/Home'
 import PropertyScreen from './screens/Property'
 import RequestsScreen from './screens/Requests'
 import ArrivalPrepScreen from './screens/ArrivalPrep'
-import LifestyleScreen from './screens/Lifestyle'
+import EventsScreen from './screens/Events'
 import MessagesScreen from './screens/Messages'
+import OwnerDashboard from './screens/OwnerDashboard'
 
 const pageVariants = {
   initial: { opacity: 0, y: 8 },
@@ -49,13 +50,20 @@ function AppInner() {
     <AppShell client={client} unreadCount={unreadCount}>
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
+          {/* Owner routes */}
+          <Route path="/owner" element={<AnimatedRoute><OwnerDashboard /></AnimatedRoute>} />
+
+          {/* Client routes */}
           <Route path="/" element={<AnimatedRoute><HomeScreen client={client} /></AnimatedRoute>} />
           <Route path="/home" element={<Navigate to="/" replace />} />
           <Route path="/property" element={<AnimatedRoute><PropertyScreen client={client} /></AnimatedRoute>} />
           <Route path="/requests" element={<AnimatedRoute><RequestsScreen /></AnimatedRoute>} />
           <Route path="/arrival" element={<AnimatedRoute><ArrivalPrepScreen /></AnimatedRoute>} />
-          <Route path="/lifestyle" element={<AnimatedRoute><LifestyleScreen /></AnimatedRoute>} />
+          <Route path="/events" element={<AnimatedRoute><EventsScreen /></AnimatedRoute>} />
           <Route path="/messages" element={<AnimatedRoute><MessagesScreen client={client} /></AnimatedRoute>} />
+
+          {/* Legacy redirect */}
+          <Route path="/lifestyle" element={<Navigate to="/requests" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AnimatePresence>

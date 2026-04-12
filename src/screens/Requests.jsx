@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import styled from 'styled-components'
 import {
-  Wrench, Calendar, Eye, Package, UtensilsCrossed, Map, Plane, Car, Ticket,
-  Anchor, ShoppingBag, Gift, Search, Shirt, Users, Home, Star, ChevronDown, ChevronUp
+  Thermometer, Waves, Wrench, Zap, TreePine, Sparkles, Bug, HardHat,
+  UtensilsCrossed, Map, Plane, Car, Ticket, Anchor, ShoppingBag, Gift,
+  Search, Shirt, Users, Home, Star, ChevronDown, ChevronUp, AlertTriangle
 } from 'lucide-react'
 import { theme } from '../styles/theme'
 import BottomSheet from '../components/layout/BottomSheet'
@@ -21,19 +21,21 @@ const Page = styled.div`
 
 const TabRow = styled.div`
   display: flex;
-  padding: 20px 20px 0;
+  padding: 0 16px;
   gap: 0;
   border-bottom: 1px solid rgba(184,150,106,0.1);
-  margin-bottom: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
 `
 
 const Tab = styled.button`
   font-family: ${theme.fonts.sans};
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: ${p => p.$active ? 500 : 400};
   color: ${p => p.$active ? theme.colors.gold : theme.colors.muted};
   border-bottom: 2px solid ${p => p.$active ? theme.colors.gold : 'transparent'};
-  padding: 10px 16px 12px;
+  padding: 16px 14px 14px;
   background: none;
   border-top: none;
   border-left: none;
@@ -43,6 +45,9 @@ const Tab = styled.button`
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 `
 
 const CountBadge = styled.span`
@@ -54,16 +59,104 @@ const CountBadge = styled.span`
   border-radius: ${theme.radius.full};
 `
 
-const NewContent = styled.div`
-  padding: 20px;
+/* ── Maintenance Tab ── */
+const MaintContent = styled.div`
+  padding: 20px 16px;
 `
 
-const RequestSubHeader = styled.h2`
-  font-family: ${theme.fonts.serif};
-  font-size: 1.2rem;
-  font-weight: 400;
-  color: ${theme.colors.cream};
+const UrgentBanner = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(217,119,6,0.08);
+  border: 1px solid rgba(217,119,6,0.3);
+  border-radius: ${theme.radius.lg};
   margin-bottom: 20px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+`
+
+const UrgentLabel = styled.div`
+  flex: 1;
+  font-family: ${theme.fonts.sans};
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: ${theme.colors.amber};
+`
+
+const UrgentSub = styled.div`
+  font-family: ${theme.fonts.sans};
+  font-size: 0.72rem;
+  color: rgba(217,119,6,0.7);
+  margin-top: 2px;
+`
+
+const SectionLabel = styled.p`
+  font-family: ${theme.fonts.sans};
+  font-size: 0.68rem;
+  color: ${theme.colors.gold};
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+  margin-bottom: 12px;
+`
+
+const MaintGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+`
+
+const MaintTile = styled.button`
+  background: ${theme.colors.surface};
+  border: 1px solid rgba(184,150,106,0.15);
+  border-radius: 14px;
+  padding: 18px 14px;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s, border-color 0.12s;
+
+  &:active {
+    background: rgba(184,150,106,0.08);
+    border-color: rgba(184,150,106,0.35);
+  }
+`
+
+const MaintIcon = styled.div`
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(184,150,106,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+`
+
+const MaintLabel = styled.p`
+  font-family: ${theme.fonts.sans};
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: ${theme.colors.cream};
+  margin-bottom: 3px;
+`
+
+const MaintSub = styled.p`
+  font-family: ${theme.fonts.sans};
+  font-size: 0.72rem;
+  color: ${theme.colors.muted};
+  line-height: 1.3;
+`
+
+/* ── Experiences Tab ── */
+const ExperiencesContent = styled.div`
+  padding: 20px 16px;
 `
 
 const RowLabel = styled.div`
@@ -71,6 +164,8 @@ const RowLabel = styled.div`
   align-items: center;
   gap: 8px;
   margin: 20px 0 12px;
+
+  &:first-child { margin-top: 0; }
 
   span {
     font-family: ${theme.fonts.sans};
@@ -95,7 +190,7 @@ const TileGrid = styled.div`
   gap: 8px;
 `
 
-const Tile = styled(motion.button)`
+const Tile = styled.button`
   background: ${theme.colors.surface};
   border: 1px solid rgba(184,150,106,0.15);
   border-radius: 12px;
@@ -103,6 +198,14 @@ const Tile = styled(motion.button)`
   text-align: left;
   cursor: pointer;
   min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s, border-color 0.12s;
+
+  &:active {
+    background: rgba(184,150,106,0.08);
+    border-color: rgba(184,150,106,0.35);
+  }
 `
 
 const TileIcon = styled.div`
@@ -126,6 +229,7 @@ const TileSub = styled.p`
   color: ${theme.colors.muted};
 `
 
+/* ── Sheet ── */
 const SheetContent = styled.div`
   display: flex;
   flex-direction: column;
@@ -163,12 +267,9 @@ const TextArea = styled.textarea`
   resize: none;
   min-height: 80px;
   transition: border-color 0.15s;
+  box-sizing: border-box;
 
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.gold};
-  }
-
+  &:focus { outline: none; border-color: ${theme.colors.gold}; }
   &::placeholder { color: ${theme.colors.faint}; }
 `
 
@@ -182,6 +283,7 @@ const DateInput = styled.input`
   font-family: ${theme.fonts.sans};
   font-size: 0.9rem;
   transition: border-color 0.15s;
+  box-sizing: border-box;
 
   &:focus { outline: none; border-color: ${theme.colors.gold}; }
 `
@@ -200,6 +302,7 @@ const PriorityBtn = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
+  touch-action: manipulation;
   border: 1px solid ${p => p.$active && p.$urgent
     ? theme.colors.amber
     : p.$active ? theme.colors.gold : 'rgba(184,150,106,0.2)'};
@@ -222,9 +325,9 @@ const SheetFooter = styled.p`
   text-align: center;
 `
 
-// My Requests
-const RequestsContent = styled.div`
-  padding: 16px 20px;
+/* ── History Tab ── */
+const HistoryContent = styled.div`
+  padding: 16px;
 `
 
 const FilterRow = styled.div`
@@ -248,9 +351,11 @@ const FilterChip = styled.button`
   cursor: pointer;
   white-space: nowrap;
   min-height: 36px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 `
 
-const RequestCard = styled(motion.div)`
+const RequestCard = styled.div`
   background: ${theme.colors.surface};
   border: 1px solid rgba(184,150,106,0.12);
   border-radius: ${theme.radius.lg};
@@ -268,6 +373,8 @@ const RequestCardTop = styled.button`
   border: none;
   cursor: pointer;
   text-align: left;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 `
 
 const RequestType = styled.p`
@@ -338,14 +445,19 @@ const EmptyState = styled.div`
   padding: 48px 20px;
 `
 
-const REQUESTS_DATA = [
-  { type: 'Something Needs Fixing', sub: 'Plumbing, electric, HVAC, general', Icon: Wrench, cat: 'estate' },
-  { type: 'Schedule a Service', sub: 'Coordinate with vendors', Icon: Calendar, cat: 'estate' },
-  { type: 'Property Check', sub: 'I want eyes on my home', Icon: Eye, cat: 'estate' },
-  { type: 'Package / Delivery', sub: 'Manage an incoming delivery', Icon: Package, cat: 'estate' },
+/* ── Data ── */
+const MAINTENANCE_CATS = [
+  { type: 'HVAC Issue', sub: 'Heating, cooling, airflow', Icon: Thermometer, cat: 'maintenance' },
+  { type: 'Pool Problem', sub: 'Equipment, chemistry, pump', Icon: Waves, cat: 'maintenance' },
+  { type: 'Plumbing', sub: 'Leak, drain, pressure', Icon: Wrench, cat: 'maintenance' },
+  { type: 'Electrical', sub: 'Breaker, outlet, lighting', Icon: Zap, cat: 'maintenance' },
+  { type: 'Landscaping', sub: 'Irrigation, plants, patio', Icon: TreePine, cat: 'maintenance' },
+  { type: 'Cleaning', sub: 'Deep clean, arrival prep', Icon: Sparkles, cat: 'maintenance' },
+  { type: 'Pest Control', sub: 'Inspection, treatment', Icon: Bug, cat: 'maintenance' },
+  { type: 'General Repair', sub: 'Other issue at the property', Icon: HardHat, cat: 'maintenance' },
 ]
 
-const LIFESTYLE_DATA = [
+const LIFESTYLE_TILES = [
   { type: 'Restaurant Reservation', sub: 'Any table, any night', Icon: UtensilsCrossed, cat: 'lifestyle' },
   { type: 'Travel Planning', sub: 'Itineraries, hotels, transfers', Icon: Map, cat: 'lifestyle' },
   { type: 'Private Aviation', sub: 'Coordinate your flight', Icon: Plane, cat: 'lifestyle' },
@@ -354,14 +466,14 @@ const LIFESTYLE_DATA = [
   { type: 'Yacht / Boat Charter', sub: 'On any water, anywhere', Icon: Anchor, cat: 'lifestyle' },
 ]
 
-const SHOPPING_DATA = [
+const SHOPPING_TILES = [
   { type: 'Grocery Stock', sub: 'For my next arrival', Icon: ShoppingBag, cat: 'shopping' },
   { type: 'Personal Shopping', sub: 'Fashion, gifts, sourcing', Icon: Gift, cat: 'shopping' },
   { type: 'Specialty Item', sub: "Hard to find. We'll find it.", Icon: Search, cat: 'shopping' },
   { type: 'Wardrobe', sub: 'Curation and styling', Icon: Shirt, cat: 'shopping' },
 ]
 
-const EVENT_DATA = [
+const EVENT_TILES = [
   { type: 'Dinner Party', sub: "I'm hosting guests", Icon: Users, cat: 'event' },
   { type: 'Family Visit', sub: 'Prepare the property', Icon: Home, cat: 'event' },
   { type: 'Special Occasion', sub: 'Something is happening', Icon: Star, cat: 'event' },
@@ -370,7 +482,14 @@ const EVENT_DATA = [
 const PREFILL_NOTES = {
   'Grocery Stock': "We'll use your standard list. Let us know anything different.",
   'Restaurant Reservation': 'We know your preferences. Any specific date or occasion?',
-  'Arrival Prep': 'Your standard arrival prep is saved. Any changes this time?',
+  'HVAC Issue': 'We will contact your HVAC vendor immediately. Any details help us prioritize.',
+  'Pool Problem': 'Desert Pool Professionals will be notified. Describe the issue below.',
+  'Plumbing': "We'll dispatch your plumber. Is the water shut off needed?",
+  'Electrical': "Safety first — if there's any risk, we'll escalate immediately.",
+  'Landscaping': "Verde Desert Landscaping will be coordinated. Describe what you've noticed.",
+  'Cleaning': "Pristine Estate will be scheduled. Arrival prep or regular clean?",
+  'Pest Control': "Desert Shield Pest will be contacted for assessment and treatment.",
+  'General Repair': "Describe the issue and we'll identify the right vendor.",
 }
 
 const PLACEHOLDERS = {
@@ -379,6 +498,10 @@ const PLACEHOLDERS = {
   'Exotic / Luxury Vehicle': 'Type of vehicle, dates, any preferences?',
   'Travel Planning': 'Destination, dates, number of travelers?',
   'Personal Shopping': 'Item, occasion, budget?',
+  'HVAC Issue': 'What are you experiencing? Noise, no cooling, etc.',
+  'Pool Problem': 'Is the pool pump running? Any visible issues?',
+  'Plumbing': 'Location of the issue. Any active leaks?',
+  'Electrical': 'Which area? Any safety concerns?',
   default: 'Leave blank if we already know what you need.',
 }
 
@@ -399,6 +522,7 @@ function RequestSheet({ service, isOpen, onClose, onSubmit }) {
 
   if (!service) return null
 
+  const isMaintenance = service.cat === 'maintenance'
   const prefillNote = PREFILL_NOTES[service.type] || "We'll take it from here. Any details we should know?"
   const placeholder = PLACEHOLDERS[service.type] || PLACEHOLDERS.default
 
@@ -415,7 +539,7 @@ function RequestSheet({ service, isOpen, onClose, onSubmit }) {
       <SheetContent>
         <PrefilledNote>{prefillNote}</PrefilledNote>
         <div>
-          <FieldLabel>Anything to add?</FieldLabel>
+          <FieldLabel>Details</FieldLabel>
           <TextArea
             rows={3}
             value={notes}
@@ -441,13 +565,17 @@ function RequestSheet({ service, isOpen, onClose, onSubmit }) {
             </PriorityBtn>
           </PriorityRow>
           {priority === 'urgent' && (
-            <UrgentNote style={{ marginTop: 8 }}>Urgent requests are actioned within 2 hours.</UrgentNote>
+            <UrgentNote style={{ marginTop: 8 }}>
+              {isMaintenance ? 'Urgent maintenance is actioned within 2 hours.' : 'Urgent requests are actioned within 2 hours.'}
+            </UrgentNote>
           )}
         </div>
-        <div>
-          <FieldLabel>Needed by</FieldLabel>
-          <DateInput type="date" value={needBy} onChange={e => setNeedBy(e.target.value)} />
-        </div>
+        {!isMaintenance && (
+          <div>
+            <FieldLabel>Needed by</FieldLabel>
+            <DateInput type="date" value={needBy} onChange={e => setNeedBy(e.target.value)} />
+          </div>
+        )}
         <PrimaryButton fullWidth onClick={handleSubmit}>Submit Request</PrimaryButton>
         <SheetFooter>Your Avara team will confirm within the hour.</SheetFooter>
       </SheetContent>
@@ -455,29 +583,8 @@ function RequestSheet({ service, isOpen, onClose, onSubmit }) {
   )
 }
 
-function TileRow({ data, onSelect }) {
-  return (
-    <TileGrid>
-      {data.map(({ type, sub, Icon, cat }) => (
-        <Tile
-          key={type}
-          whileTap={{ scale: 0.96 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          onClick={() => onSelect({ type, sub, cat })}
-          aria-label={type}
-        >
-          <TileIcon><Icon size={22} /></TileIcon>
-          <TileLabel>{type}</TileLabel>
-          <TileSub>{sub}</TileSub>
-        </Tile>
-      ))}
-    </TileGrid>
-  )
-}
-
 export default function RequestsScreen() {
-  const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('new')
+  const [activeTab, setActiveTab] = useState('maintenance')
   const [selectedService, setSelectedService] = useState(null)
   const [expandedReq, setExpandedReq] = useState(null)
   const [filter, setFilter] = useState('all')
@@ -507,31 +614,82 @@ export default function RequestsScreen() {
   return (
     <Page>
       <TabRow>
-        <Tab $active={activeTab === 'new'} onClick={() => setActiveTab('new')}>New Request</Tab>
+        <Tab $active={activeTab === 'maintenance'} onClick={() => setActiveTab('maintenance')}>
+          Maintenance
+        </Tab>
+        <Tab $active={activeTab === 'experiences'} onClick={() => setActiveTab('experiences')}>
+          Experiences
+        </Tab>
         <Tab $active={activeTab === 'history'} onClick={() => setActiveTab('history')}>
           My Requests
           {openCount > 0 && <CountBadge>{openCount}</CountBadge>}
         </Tab>
       </TabRow>
 
-      {activeTab === 'new' ? (
-        <NewContent>
-          <RequestSubHeader>What can we arrange for you?</RequestSubHeader>
+      {activeTab === 'maintenance' && (
+        <MaintContent>
+          <UrgentBanner
+            onClick={() => setSelectedService({ type: 'General Repair', sub: 'Emergency issue', cat: 'maintenance', urgent: true })}
+          >
+            <AlertTriangle size={22} color={theme.colors.amber} />
+            <div>
+              <UrgentLabel>Something needs immediate attention</UrgentLabel>
+              <UrgentSub>Tap to report — we respond within 2 hours</UrgentSub>
+            </div>
+          </UrgentBanner>
 
-          <RowLabel><span>Estate</span></RowLabel>
-          <TileRow data={REQUESTS_DATA} onSelect={setSelectedService} />
+          <SectionLabel>Select a category</SectionLabel>
+          <MaintGrid>
+            {MAINTENANCE_CATS.map(({ type, sub, Icon, cat }) => (
+              <MaintTile key={type} onClick={() => setSelectedService({ type, sub, cat })} aria-label={type}>
+                <MaintIcon><Icon size={20} color={theme.colors.gold} /></MaintIcon>
+                <MaintLabel>{type}</MaintLabel>
+                <MaintSub>{sub}</MaintSub>
+              </MaintTile>
+            ))}
+          </MaintGrid>
+        </MaintContent>
+      )}
 
+      {activeTab === 'experiences' && (
+        <ExperiencesContent>
           <RowLabel><span>Lifestyle</span></RowLabel>
-          <TileRow data={LIFESTYLE_DATA} onSelect={setSelectedService} />
+          <TileGrid>
+            {LIFESTYLE_TILES.map(({ type, sub, Icon, cat }) => (
+              <Tile key={type} onClick={() => setSelectedService({ type, sub, cat })} aria-label={type}>
+                <TileIcon><Icon size={22} /></TileIcon>
+                <TileLabel>{type}</TileLabel>
+                <TileSub>{sub}</TileSub>
+              </Tile>
+            ))}
+          </TileGrid>
 
           <RowLabel><span>Shopping</span></RowLabel>
-          <TileRow data={SHOPPING_DATA} onSelect={setSelectedService} />
+          <TileGrid>
+            {SHOPPING_TILES.map(({ type, sub, Icon, cat }) => (
+              <Tile key={type} onClick={() => setSelectedService({ type, sub, cat })} aria-label={type}>
+                <TileIcon><Icon size={22} /></TileIcon>
+                <TileLabel>{type}</TileLabel>
+                <TileSub>{sub}</TileSub>
+              </Tile>
+            ))}
+          </TileGrid>
 
           <RowLabel><span>Event Prep</span></RowLabel>
-          <TileRow data={EVENT_DATA} onSelect={setSelectedService} />
-        </NewContent>
-      ) : (
-        <RequestsContent>
+          <TileGrid>
+            {EVENT_TILES.map(({ type, sub, Icon, cat }) => (
+              <Tile key={type} onClick={() => setSelectedService({ type, sub, cat })} aria-label={type}>
+                <TileIcon><Icon size={22} /></TileIcon>
+                <TileLabel>{type}</TileLabel>
+                <TileSub>{sub}</TileSub>
+              </Tile>
+            ))}
+          </TileGrid>
+        </ExperiencesContent>
+      )}
+
+      {activeTab === 'history' && (
+        <HistoryContent>
           <FilterRow>
             {['all', 'open', 'completed'].map(f => (
               <FilterChip key={f} $active={filter === f} onClick={() => setFilter(f)}>
@@ -542,11 +700,11 @@ export default function RequestsScreen() {
 
           {filtered.length === 0 ? (
             <EmptyState>
-              <Star size={40} color={theme.colors.gold} style={{ margin: '0 auto 12px' }} />
+              <Star size={40} color={theme.colors.gold} style={{ margin: '0 auto 12px', display: 'block' }} />
               <p style={{ fontFamily: theme.fonts.serif, fontSize: '1.1rem', color: theme.colors.cream, marginBottom: 8 }}>
                 Your first request is one tap away.
               </p>
-              <PrimaryButton onClick={() => setActiveTab('new')} style={{ margin: '12px auto 0', display: 'block' }}>
+              <PrimaryButton onClick={() => setActiveTab('maintenance')} style={{ margin: '12px auto 0', display: 'block' }}>
                 Make a Request
               </PrimaryButton>
             </EmptyState>
@@ -556,9 +714,14 @@ export default function RequestsScreen() {
                 <RequestCardTop onClick={() => setExpandedReq(expandedReq === req.id ? null : req.id)}>
                   <RequestType>{req.type}</RequestType>
                   <StatusBadge status={req.status} />
-                  {expandedReq === req.id ? <ChevronUp size={14} color={theme.colors.muted} /> : <ChevronDown size={14} color={theme.colors.muted} />}
+                  {expandedReq === req.id
+                    ? <ChevronUp size={14} color={theme.colors.muted} />
+                    : <ChevronDown size={14} color={theme.colors.muted} />
+                  }
                 </RequestCardTop>
-                <RequestDetail>{req.detail?.substring(0, 80)}{req.detail?.length > 80 ? '...' : ''}</RequestDetail>
+                <RequestDetail>
+                  {req.detail?.substring(0, 80)}{req.detail?.length > 80 ? '...' : ''}
+                </RequestDetail>
                 <AnimatePresence>
                   {expandedReq === req.id && (
                     <motion.div
@@ -576,7 +739,10 @@ export default function RequestsScreen() {
                       )}
                       {req.status === 'in_progress' && (
                         <InProgressPulse>
-                          <PulsingDot animate={{ scale: [1, 1.3, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} />
+                          <PulsingDot
+                            animate={{ scale: [1, 1.3, 1] }}
+                            transition={{ repeat: Infinity, duration: 1.5 }}
+                          />
                           <span style={{ fontFamily: theme.fonts.sans, fontSize: '0.8rem', color: theme.colors.amber }}>
                             We're working on this.
                           </span>
@@ -589,7 +755,7 @@ export default function RequestsScreen() {
               </RequestCard>
             ))
           )}
-        </RequestsContent>
+        </HistoryContent>
       )}
 
       <RequestSheet

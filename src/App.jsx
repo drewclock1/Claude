@@ -24,7 +24,7 @@ const pageVariants = {
   exit: { opacity: 0, y: -4 },
 }
 
-const pageTransition = { duration: 0.22, ease: 'easeOut' }
+const pageTransition = { duration: 0.2, ease: 'easeOut' }
 
 function AnimatedRoute({ children }) {
   return (
@@ -50,8 +50,10 @@ function AppInner() {
     <AppShell client={client} unreadCount={unreadCount}>
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
-          {/* Owner routes */}
+          {/* Owner routes — all render OwnerDashboard with tab derived from path */}
           <Route path="/owner" element={<AnimatedRoute><OwnerDashboard /></AnimatedRoute>} />
+          <Route path="/owner/clients" element={<AnimatedRoute><OwnerDashboard /></AnimatedRoute>} />
+          <Route path="/owner/messages" element={<AnimatedRoute><OwnerDashboard /></AnimatedRoute>} />
 
           {/* Client routes */}
           <Route path="/" element={<AnimatedRoute><HomeScreen client={client} /></AnimatedRoute>} />
@@ -62,7 +64,7 @@ function AppInner() {
           <Route path="/events" element={<AnimatedRoute><EventsScreen /></AnimatedRoute>} />
           <Route path="/messages" element={<AnimatedRoute><MessagesScreen client={client} /></AnimatedRoute>} />
 
-          {/* Legacy redirect */}
+          {/* Legacy */}
           <Route path="/lifestyle" element={<Navigate to="/requests" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -1,19 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Avara Home OS</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Playfair+Display:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agency CRM</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
+    header { background: #1a1d27; border-bottom: 1px solid #2d3148; padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    header .logo { font-size: 1.4rem; font-weight: 700; background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; }
+    header .tagline { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+    .header-stats { display: flex; gap: 28px; }
+    .header-stat { text-align: center; }
+    .header-stat .val { font-size: 1.1rem; font-weight: 700; color: #a78bfa; }
+    .header-stat .lbl { font-size: 0.68rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .add-rep-btn { background: linear-gradient(135deg, #6366f1, #a855f7); border: none; color: #fff; padding: 9px 20px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: opacity 0.2s; }
+    .add-rep-btn:hover { opacity: 0.85; }
+    main { padding: 28px 32px; }
+    .page-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: #64748b; margin-bottom: 22px; }
+    .industry-section { margin-bottom: 36px; }
+    .industry-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #1e2235; }
+    .industry-icon { font-size: 1.4rem; width: 42px; height: 42px; background: #1a1d27; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #2d3148; }
+    .industry-name { font-size: 1.05rem; font-weight: 700; color: #e2e8f0; }
+    .industry-meta { font-size: 0.72rem; color: #64748b; margin-top: 2px; }
+    .industry-total { margin-left: auto; text-align: right; }
+    .industry-total .amount { font-size: 1.1rem; font-weight: 700; color: #34d399; }
+    .industry-total .lbl { font-size: 0.7rem; color: #64748b; }
+    .cards-grid { display: flex; flex-wrap: wrap; gap: 14px; }
+    .rep-card { background: #1a1d27; border: 1px solid #2d3148; border-radius: 14px; padding: 18px 20px; width: 210px; position: relative; transition: transform 0.15s, border-color 0.15s; cursor: default; }
+    .rep-card:hover { transform: translateY(-3px); border-color: #6366f1; }
+    .rep-card .rank-badge { position: absolute; top: 12px; right: 12px; font-size: 0.65rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .rank-gold { background: #78350f; color: #fbbf24; }
+    .rank-silver { background: #1e293b; color: #94a3b8; }
+    .rank-bronze { background: #431407; color: #fb923c; }
+    .rank-new { background: #1e1b4b; color: #818cf8; }
+    .rep-avatar { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; border: 2px solid #2d3148; }
+    .rep-name { font-size: 0.92rem; font-weight: 700; color: #e2e8f0; margin-bottom: 3px; }
+    .rep-company { font-size: 0.73rem; color: #94a3b8; margin-bottom: 12px; }
+    .rep-stats { display: flex; flex-direction: column; gap: 7px; }
+    .stat-row { display: flex; justify-content: space-between; align-items: center; }
+    .stat-lbl { font-size: 0.68rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-val { font-size: 0.82rem; font-weight: 700; }
+    .val-green { color: #34d399; }
+    .val-purple { color: #a78bfa; }
+    .sales-bar-wrap { margin-top: 10px; }
+    .sales-bar-bg { height: 5px; background: #2d3148; border-radius: 3px; overflow: hidden; }
+    .sales-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #6366f1, #a855f7); transition: width 0.6s ease; }
+    .card-actions { display: flex; gap: 6px; margin-top: 13px; }
+    .card-btn { flex: 1; padding: 5px; border-radius: 6px; border: 1px solid #2d3148; background: transparent; color: #94a3b8; font-size: 0.7rem; cursor: pointer; transition: background 0.15s, color 0.15s; }
+    .card-btn:hover { background: #2d3148; color: #e2e8f0; }
+    .empty-slot { width: 210px; border: 2px dashed #2d3148; border-radius: 14px; padding: 28px 20px; text-align: center; color: #374151; font-size: 0.78rem; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+    .empty-slot:hover { border-color: #6366f1; color: #6366f1; }
+    .empty-slot .plus { font-size: 1.4rem; display: block; margin-bottom: 6px; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #1a1d27; border: 1px solid #2d3148; border-radius: 16px; padding: 28px; width: 400px; max-width: 95vw; }
+    .modal h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 22px; color: #e2e8f0; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-group input, .form-group select { width: 100%; background: #0f1117; border: 1px solid #2d3148; color: #e2e8f0; padding: 9px 12px; border-radius: 8px; font-size: 0.88rem; outline: none; transition: border-color 0.15s; }
+    .form-group input:focus, .form-group select:focus { border-color: #6366f1; }
+    .form-group select option { background: #1a1d27; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-save { flex: 1; background: linear-gradient(135deg, #6366f1, #a855f7); border: none; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+    .btn-cancel { flex: 1; background: transparent; border: 1px solid #2d3148; color: #94a3b8; padding: 10px; border-radius: 8px; font-size: 0.88rem; cursor: pointer; }
+    .btn-cancel:hover { background: #2d3148; }
+    .toast { position: fixed; bottom: 28px; right: 28px; background: #1a1d27; border: 1px solid #34d399; color: #34d399; padding: 12px 20px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; opacity: 0; transform: translateY(10px); transition: opacity 0.3s, transform 0.3s; z-index: 300; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="logo">AGENCY CRM</div>
+    <div class="tagline">Multi-Industry Sales Dashboard</div>
+  </div>
+  <div class="header-stats">
+    <div class="header-stat"><div class="val" id="totalReps">0</div><div class="lbl">Total Reps</div></div>
+    <div class="header-stat"><div class="val" id="totalSales">$0</div><div class="lbl">Agency Sales</div></div>
+    <div class="header-stat"><div class="val">6</div><div class="lbl">Industries</div></div>
+  </div>
+  <button class="add-rep-btn" onclick="openModal()">+ Add Rep</button>
+</header>
+<main>
+  <div class="page-title">Agency Overview — All Industries</div>
+  <div id="industries-container"></div>
+</main>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2 id="modalTitle">Add New Rep</h2>
+    <div class="form-group"><label>Full Name</label><input type="text" id="f-name" placeholder="e.g. Jordan Smith" /></div>
+    <div class="form-group"><label>Industry</label><select id="f-industry"></select></div>
+    <div class="form-group"><label>Company</label><input type="text" id="f-company" placeholder="e.g. Aptive Environmental" /></div>
+    <div class="form-group"><label>Commission %</label><input type="number" id="f-commission" placeholder="e.g. 25" min="0" max="100" /></div>
+    <div class="form-group"><label>Total Sold ($)</label><input type="number" id="f-sold" placeholder="e.g. 42000" min="0" /></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveRep()">Save Rep</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const INDUSTRIES = [
+  { id:'pest',      label:'Pest Control', icon:'🐛' },
+  { id:'windows',   label:'Windows',      icon:'🪟' },
+  { id:'fiber',     label:'Fiber',        icon:'🌐' },
+  { id:'vivent',    label:'Vivent',       icon:'🏠' },
+  { id:'insurance', label:'Insurance',    icon:'🛡️' },
+  { id:'batteries', label:'Batteries',   icon:'🔋' },
+];
+let reps = [
+  { id:1,  name:'Tyler Marsh',   industry:'pest',      company:'Aptive Environmental',  commission:28, sold:58400 },
+  { id:2,  name:'Kayla Torres',  industry:'pest',      company:'Orkin Pro',             commission:22, sold:31200 },
+  { id:3,  name:'Marcus Reed',   industry:'windows',   company:'Window Nation',         commission:30, sold:74800 },
+  { id:4,  name:'Bree Nguyen',   industry:'windows',   company:'Renewal by Andersen',   commission:25, sold:49100 },
+  { id:5,  name:'Jake Liu',      industry:'fiber',     company:'CenturyLink Fiber',     commission:18, sold:22600 },
+  { id:6,  name:'Amber Wells',   industry:'fiber',     company:'Ziply Fiber',           commission:20, sold:37900 },
+  { id:7,  name:'Darius King',   industry:'vivent',    company:'Vivint Smart Home',     commission:35, sold:91500 },
+  { id:8,  name:'Sofia Diaz',    industry:'vivent',    company:'Vivint Smart Home',     commission:32, sold:68200 },
+  { id:9,  name:'Owen Clark',    industry:'insurance', company:'Allstate Agency',       commission:40, sold:53700 },
+  { id:10, name:'Priya Shah',    industry:'insurance', company:'State Farm',            commission:38, sold:61400 },
+  { id:11, name:'Cole Bennett',  industry:'batteries', company:'Sunrun',               commission:26, sold:44000 },
+  { id:12, name:'Lea Johnson',   industry:'batteries', company:'Tesla Energy',          commission:29, sold:82300 },
+];
+let nextId=13, editingId=null;
+const COLORS=['#6366f1','#a855f7','#ec4899','#f97316','#22c55e','#06b6d4','#f59e0b','#ef4444'];
+function avatarColor(name){let h=0;for(let c of name)h=(h*31+c.charCodeAt(0))&0xffffffff;return COLORS[Math.abs(h)%COLORS.length];}
+function initials(name){return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();}
+function rankBadge(list,rep){const pos=[...list].sort((a,b)=>b.sold-a.sold).findIndex(r=>r.id===rep.id);return pos===0?['#1','rank-gold']:pos===1?['#2','rank-silver']:pos===2?['#3','rank-bronze']:['NEW','rank-new'];}
+function fmt(n){return n>=1e6?'$'+(n/1e6).toFixed(1)+'M':n>=1000?'$'+(n/1000).toFixed(1)+'K':'$'+n.toLocaleString();}
+function render(){
+  const container=document.getElementById('industries-container');
+  container.innerHTML='';
+  let totalReps=0,totalSales=0;
+  INDUSTRIES.forEach(ind=>{
+    const indReps=reps.filter(r=>r.industry===ind.id);
+    const indTotal=indReps.reduce((s,r)=>s+r.sold,0);
+    totalReps+=indReps.length;totalSales+=indTotal;
+    const maxSold=Math.max(...indReps.map(r=>r.sold),1);
+    let cards=indReps.map(rep=>{
+      const [rl,rc]=rankBadge(indReps,rep);
+      const pct=Math.round(rep.sold/maxSold*100);
+      const col=avatarColor(rep.name);
+      return '<div class="rep-card"><span class="rank-badge '+rc+'">'+rl+'</span><div class="rep-avatar" style="background:'+col+'22;color:'+col+';border-color:'+col+'44">'+initials(rep.name)+'</div><div class="rep-name">'+rep.name+'</div><div class="rep-company">'+rep.company+'</div><div class="rep-stats"><div class="stat-row"><span class="stat-lbl">Commission</span><span class="stat-val val-purple">'+rep.commission+'%</span></div><div class="stat-row"><span class="stat-lbl">Total Sold</span><span class="stat-val val-green">'+fmt(rep.sold)+'</span></div></div><div class="sales-bar-wrap"><div class="sales-bar-bg"><div class="sales-bar-fill" style="width:'+pct+'%"></div></div></div><div class="card-actions"><button class="card-btn" onclick="openEditModal('+rep.id+')">Edit</button><button class="card-btn" onclick="deleteRep('+rep.id+')">Remove</button></div></div>';
+    }).join('');
+    cards+='<div class="empty-slot" onclick="openModalForIndustry(\''+ind.id+'\')" ><span class="plus">+</span>Add Rep</div>';
+    const sec=document.createElement('div');
+    sec.className='industry-section';
+    sec.innerHTML='<div class="industry-header"><div class="industry-icon">'+ind.icon+'</div><div><div class="industry-name">'+ind.label+'</div><div class="industry-meta">'+indReps.length+' rep'+(indReps.length!==1?'s':'')+' active</div></div><div class="industry-total"><div class="amount">'+fmt(indTotal)+'</div><div class="lbl">Industry Total</div></div></div><div class="cards-grid">'+cards+'</div>';
+    container.appendChild(sec);
+  });
+  document.getElementById('totalReps').textContent=totalReps;
+  document.getElementById('totalSales').textContent=fmt(totalSales);
+}
+function populateIndustrySelect(sel){document.getElementById('f-industry').innerHTML=INDUSTRIES.map(i=>'<option value="'+i.id+'"'+(i.id===sel?' selected':'')+'>'+i.label+'</option>').join('');}
+function openModal(ind){editingId=null;document.getElementById('modalTitle').textContent='Add New Rep';['f-name','f-company','f-commission','f-sold'].forEach(id=>document.getElementById(id).value='');populateIndustrySelect(ind||INDUSTRIES[0].id);document.getElementById('modalOverlay').classList.add('open');}
+function openModalForIndustry(id){openModal(id);}
+function openEditModal(id){const rep=reps.find(r=>r.id===id);if(!rep)return;editingId=id;document.getElementById('modalTitle').textContent='Edit Rep';document.getElementById('f-name').value=rep.name;document.getElementById('f-company').value=rep.company;document.getElementById('f-commission').value=rep.commission;document.getElementById('f-sold').value=rep.sold;populateIndustrySelect(rep.industry);document.getElementById('modalOverlay').classList.add('open');}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+function saveRep(){const name=document.getElementById('f-name').value.trim();const industry=document.getElementById('f-industry').value;const company=document.getElementById('f-company').value.trim();const commission=parseFloat(document.getElementById('f-commission').value);const sold=parseFloat(document.getElementById('f-sold').value)||0;if(!name||!company||isNaN(commission)){alert('Please fill in Name, Company, and Commission %.');return;}if(editingId!==null){Object.assign(reps.find(r=>r.id===editingId),{name,industry,company,commission,sold});showToast('Rep updated!');}else{reps.push({id:nextId++,name,industry,company,commission,sold});showToast('Rep added!');}closeModal();render();}
+function deleteRep(id){if(!confirm('Remove this rep?'))return;reps=reps.filter(r=>r.id!==id);showToast('Rep removed.');render();}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalOverlay'))closeModal();});
+render();
+</script>
+</body>
 </html>
